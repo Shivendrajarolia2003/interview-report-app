@@ -56,10 +56,10 @@ def extract_students_from_image(uploaded_image_file, api_key=None):
         # Load image with PIL
         image = Image.open(uploaded_image_file)
         
-        # Call Gemini Vision API
+        # Call Gemini Vision API with high-quota lite models
         response = None
         last_error = None
-        for model_name in ["gemini-3.5-flash", "gemini-3.8-flash", "gemini-3.1-pro-preview"]:
+        for model_name in ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash", "gemini-3.8-flash"]:
             try:
                 response = client.models.generate_content(
                     model=model_name,

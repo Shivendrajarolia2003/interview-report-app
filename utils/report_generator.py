@@ -118,7 +118,7 @@ Please generate the complete 13-section interview feedback report following all 
     try:
         from google import genai
         client = genai.Client(api_key=key_to_use)
-        for model_name in ["gemini-3.5-flash", "gemini-3.8-flash", "gemini-3.1-pro-preview"]:
+        for model_name in ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash", "gemini-3.8-flash"]:
             try:
                 response = client.models.generate_content(
                     model=model_name,
@@ -165,7 +165,7 @@ Please generate the complete Executive Batch Insights & HR Training Plan Report 
     try:
         from google import genai
         client = genai.Client(api_key=key_to_use)
-        for model_name in ["gemini-3.5-flash", "gemini-3.8-flash", "gemini-3.1-pro-preview"]:
+        for model_name in ["gemini-3.5-flash-lite", "gemini-3.1-flash-lite", "gemini-3.6-flash", "gemini-3.8-flash"]:
             try:
                 response = client.models.generate_content(
                     model=model_name,
