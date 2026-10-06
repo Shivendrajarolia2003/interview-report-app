@@ -3,7 +3,8 @@ import json
 import re
 from PIL import Image
 import pandas as pd
-from config import GEMINI_API_KEY
+import streamlit as st
+from config import get_secret
 
 VISION_PROMPT = """
 You are an expert OCR & Document Intelligence AI.
@@ -43,9 +44,10 @@ def extract_students_from_image(uploaded_image_file, api_key=None):
     Uses Gemini Vision API to extract structured candidate data from photos
     of handwritten/printed interview assessment sheets, supporting multi-domain fields.
     """
-    key_to_use = api_key or os.getenv("GEMINI_API_KEY", "") or GEMINI_API_KEY
+    key_to_use = api_key or get_secret("GEMINI_API_KEY")
+    
     if not key_to_use:
-        return False, "Google Gemini API Key is required for Image OCR & Vision extraction.", None
+        return False, "Google Gemini API Key is missing. Please enter it in the Sidebar or configure Streamlit Secrets.", None
 
     try:
         from google import genai
@@ -56,6 +58,7 @@ def extract_students_from_image(uploaded_image_file, api_key=None):
         
         # Call Gemini Vision API
         response = None
+        last_error = None
         for model_name in ["gemini-3.5-flash", "gemini-3.8-flash", "gemini-3.1-pro-preview"]:
             try:
                 response = client.models.generate_content(
@@ -65,11 +68,11 @@ def extract_students_from_image(uploaded_image_file, api_key=None):
                 if response and response.text:
                     break
             except Exception as err:
-                print(f"Vision model {model_name} error: {err}")
+                last_error = str(err)
                 continue
                 
         if not response or not response.text:
-            return False, "Could not extract text from image. Please check image clarity.", None
+            return False, f"Could not extract text from image. ({last_error or 'No response from API'}).", None
             
         raw_text = response.text.strip()
         
@@ -82,7 +85,6 @@ def extract_students_from_image(uploaded_image_file, api_key=None):
         if isinstance(student_records, dict):
             student_records = [student_records]
             
-        # Standardize score dictionaries inside records into flattened printable text if needed
         for r in student_records:
             if "Key Strengths" in r and "strengths" not in r:
                 r["strengths"] = r["Key Strengths"]

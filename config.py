@@ -1,4 +1,5 @@
 import os
+import streamlit as st
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -15,14 +16,25 @@ DATA_DIR.mkdir(parents=True, exist_ok=True)
 OUTPUTS_DIR.mkdir(parents=True, exist_ok=True)
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
 
+def get_secret(key_name, default_val=""):
+    """Fetches key from env vars, Streamlit Secrets, or fallback default."""
+    if os.getenv(key_name):
+        return os.getenv(key_name)
+    try:
+        if hasattr(st, "secrets") and key_name in st.secrets:
+            return str(st.secrets[key_name])
+    except Exception:
+        pass
+    return default_val
+
 # App Configurations
-GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
-SMTP_SERVER = os.getenv("SMTP_SERVER", "smtp.gmail.com")
-SMTP_PORT = int(os.getenv("SMTP_PORT", 587))
-SMTP_USERNAME = os.getenv("SMTP_USERNAME", "")
-SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
-SENDER_NAME = os.getenv("SENDER_NAME", "Company Recruitment Team")
-ADMIN_PASSWORD = os.getenv("ADMIN_PASSWORD", "admin123")
+GEMINI_API_KEY = get_secret("GEMINI_API_KEY", "")
+SMTP_SERVER = get_secret("SMTP_SERVER", "smtp.gmail.com")
+SMTP_PORT = int(get_secret("SMTP_PORT", 587))
+SMTP_USERNAME = get_secret("SMTP_USERNAME", "")
+SMTP_PASSWORD = get_secret("SMTP_PASSWORD", "")
+SENDER_NAME = get_secret("SENDER_NAME", "Company Recruitment Team")
+ADMIN_PASSWORD = get_secret("ADMIN_PASSWORD", "admin123")
 
 # Standard Target Field Definitions for Column Mapping
 STANDARD_FIELDS = {

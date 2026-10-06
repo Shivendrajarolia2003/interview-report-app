@@ -1,6 +1,6 @@
 import os
 import json
-from config import GEMINI_API_KEY
+from config import get_secret
 
 SYSTEM_PROMPT = """
 You are an expert, professional technical interviewer and career mentor.
@@ -91,7 +91,7 @@ def generate_ai_report(student_data, api_key=None):
     Generates personalized interview feedback report using Google Gemini API.
     If API key is missing, returns a structured fallback report.
     """
-    key_to_use = api_key or os.getenv("GEMINI_API_KEY", "") or GEMINI_API_KEY
+    key_to_use = api_key or get_secret("GEMINI_API_KEY")
     
     name = student_data.get("name", "Student")
     email = student_data.get("email", "")
@@ -118,7 +118,6 @@ Please generate the complete 13-section interview feedback report following all 
     try:
         from google import genai
         client = genai.Client(api_key=key_to_use)
-        # Primary model gemini-3.5-flash with fallback
         for model_name in ["gemini-3.5-flash", "gemini-3.8-flash", "gemini-3.1-pro-preview"]:
             try:
                 response = client.models.generate_content(
@@ -141,7 +140,7 @@ def generate_batch_ai_insights(students_list, api_key=None):
     Analyzes an entire batch of candidates using Gemini AI to produce
     batch-level HR analytics, skill gap matrix, and training recommendations.
     """
-    key_to_use = api_key or os.getenv("GEMINI_API_KEY", "") or GEMINI_API_KEY
+    key_to_use = api_key or get_secret("GEMINI_API_KEY")
     
     summary_data = []
     for s in students_list:
@@ -270,6 +269,6 @@ This batch consists of **{tot} evaluated candidates**. Overall performance indic
 - **Week 4 (Comprehensive Retest):** Timed coding assessment and final evaluation.
 
 ## 🏆 Top Performers & Retest Candidates
-- **Fast-Track Recommendations:** Top performing candidates based on high DSA & Python scores.
+- **Recommended Fast-Track Candidates:** Top performing candidates based on high DSA & Python scores.
 - **Mentorship Focus:** Candidates recommended for 1-on-1 TA support during Week 1.
 """
